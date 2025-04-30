@@ -29,18 +29,20 @@
   cursor: pointer;
 }
 
-form {
+.form {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-input, textarea, button {
+.input,
+.textarea,
+.button {
   padding: 10px;
   font-size: 14px;
 }
 
-button {
+.button {
   background-color: #0070f3;
   color: white;
   border: none;
@@ -48,6 +50,6 @@ button {
   cursor: pointer;
 }
 
-button:hover {
+.button:hover {
   background-color: #005bb5;
 }

@@ -25,7 +25,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+        <header style={{ backgroundColor: '#0070f3', color: '#fff', padding: '10px 20px' }}>
+          <h1>Samriddhi Setu</h1>
+        </header>
+        <main>{children}</main>
       </body>
     </html>
   );

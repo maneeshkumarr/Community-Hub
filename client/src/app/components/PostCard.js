@@ -1,98 +1,47 @@
-import { useState } from 'react';
-import { Card, Avatar, Button, Space, Typography, Image, message } from 'antd';
-import { 
-  LikeOutlined, 
-  LikeFilled, 
-  DislikeOutlined, 
-  DislikeFilled,
-  MessageOutlined,
-  ShareAltOutlined 
-} from '@ant-design/icons';
-import axios from 'axios';
-import { useSocket } from '../utils/socket';
+import React, { useState } from 'react';
+import styles from './PostCard.module.css';
+import { usePostUpdates } from '../utils/socket';
 
-const { Text, Paragraph } = Typography;
+const PostCard = ({ post, onVote }) => {
+  const [votes, setVotes] = useState(post.votes);
 
-export default function PostCard({ post, currentUser }) {
-  const [voteStatus, setVoteStatus] = useState(null);
-  const [upvotes, setUpvotes] = useState(post.upvotes);
-  const [downvotes, setDownvotes] = useState(post.downvotes);
-  const socket = useSocket();
+  usePostUpdates(post._id, (update) => {
+    if (update.type === 'vote') {
+      setVotes(update.votes);
+    }
+    // Handle other update types (e.g., comments) if needed
+  });
 
-  const handleVote = async (value) => {
+  const handleVote = async (voteType) => {
     try {
-      const newValue = voteStatus === value ? 0 : value;
-      await axios.patch(`/api/posts/${post.id}/vote`, { value: newValue });
-      
-      if (newValue === 1) {
-        setUpvotes(prev => voteStatus === 1 ? prev - 1 : prev + 1);
-        setDownvotes(prev => voteStatus === -1 ? prev - 1 : prev);
-      } else if (newValue === -1) {
-        setDownvotes(prev => voteStatus === -1 ? prev - 1 : prev + 1);
-        setUpvotes(prev => voteStatus === 1 ? prev - 1 : prev);
-      } else {
-        if (voteStatus === 1) setUpvotes(prev => prev - 1);
-        if (voteStatus === -1) setDownvotes(prev => prev - 1);
+      const response = await fetch(`/api/posts/${post._id}/vote`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ voteType }),
+      });
+      if (response.ok) {
+        const updatedPost = await response.json();
+        setVotes(updatedPost.votes);
+        if (onVote) onVote(updatedPost);
       }
-      
-      setVoteStatus(newValue === 0 ? null : newValue);
-      socket.emit('voteUpdate', { postId: post.id });
     } catch (error) {
-      message.error('Failed to process vote');
+      console.error('Error voting on post:', error);
     }
   };
 
   return (
-    <Card style={{ marginBottom: 16 }}>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
-        <Avatar src={post.userAvatar}>{post.username.charAt(0)}</Avatar>
-        <div style={{ marginLeft: 12 }}>
-          <Text strong>{post.username}</Text>
-          <br />
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            {new Date(post.created_at).toLocaleString()}
-          </Text>
-        </div>
+    <div className={styles.postCard}>
+      <h3>{post.title}</h3>
+      <p>{post.content}</p>
+      {post.image && <img src={post.image} alt={post.title} className={styles.image} />}
+      <div className={styles.actions}>
+        <button onClick={() => handleVote('upvote')}>Upvote</button>
+        <span>{votes}</span>
+        <button onClick={() => handleVote('downvote')}>Downvote</button>
       </div>
-      
-      {post.title && <Title level={5}>{post.title}</Title>}
-      <Paragraph>{post.content}</Paragraph>
-      
-      {post.image_url && (
-        <Image
-          src={post.image_url}
-          alt="Post image"
-          style={{ maxHeight: 400, objectFit: 'contain' }}
-        />
-      )}
-      
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 16 }}>
-        <Space>
-          <Button 
-            type="text" 
-            icon={voteStatus === 1 ? <LikeFilled /> : <LikeOutlined />}
-            onClick={() => handleVote(1)}
-          >
-            {upvotes}
-          </Button>
-          <Button 
-            type="text" 
-            icon={voteStatus === -1 ? <DislikeFilled /> : <DislikeOutlined />}
-            onClick={() => handleVote(-1)}
-          >
-            {downvotes}
-          </Button>
-        </Space>
-        
-        <Space>
-          <Button type="text" icon={<MessageOutlined />}>
-            {post.comment_count}
-          </Button>
-          <Button type="text" icon={<ShareAltOutlined />}>
-            Share
-          </Button>
-        </Space>
-      </div>
-    </Card>
+      <div className={styles.share}>Share</div>
+    </div>
   );
-}
+};
+
+export default PostCard;

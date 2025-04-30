@@ -1,97 +1,63 @@
-import { useState } from 'react';
-import { Modal, Form, Input, Button, Select, Upload, message } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
-import axios from 'axios';
+import React, { useState } from 'react';
+import styles from './CreatePostModal.module.css';
 
-const { TextArea } = Input;
-const { Option } = Select;
+const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [image, setImage] = useState(null);
 
-export default function CreatePostModal({ visible, onClose, onPostCreated }) {
-  const [form] = Form.useForm();
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploading, setUploading] = useState(false);
-
-  const handleImageUpload = async (file) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     const formData = new FormData();
-    formData.append('image', file);
-    
+    formData.append('title', title);
+    formData.append('content', content);
+    if (image) formData.append('image', image);
+
     try {
-      setUploading(true);
-      const response = await axios.post('/api/upload', formData);
-      setImageUrl(response.data.url);
-      return false; // Prevent default upload
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        body: formData,
+      });
+      if (response.ok) {
+        const newPost = await response.json();
+        onPostCreated(newPost);
+        onClose();
+      }
     } catch (error) {
-      message.error('Image upload failed');
-      return false;
-    } finally {
-      setUploading(false);
+      console.error('Error creating post:', error);
     }
   };
 
-  const handleSubmit = async (values) => {
-    try {
-      const response = await axios.post('/api/posts', {
-        ...values,
-        image_url: imageUrl
-      });
-      onPostCreated(response.data);
-      form.resetFields();
-      setImageUrl(null);
-      onClose();
-    } catch (error) {
-      message.error('Failed to create post');
-    }
-  };
+  if (!isOpen) return null;
 
   return (
-    <Modal
-      title="Create New Post"
-      visible={visible}
-      onCancel={onClose}
-      footer={null}
-    >
-      <Form form={form} onFinish={handleSubmit}>
-        <Form.Item name="category" rules={[{ required: true }]}>
-          <Select placeholder="Select category">
-            <Option value="discussion">Discussion</Option>
-            <Option value="news">News</Option>
-            <Option value="post">Post</Option>
-            <Option value="query">Query</Option>
-            <Option value="job">Job</Option>
-          </Select>
-        </Form.Item>
-        
-        <Form.Item name="title">
-          <Input placeholder="Title (optional)" />
-        </Form.Item>
-        
-        <Form.Item name="content" rules={[{ required: true }]}>
-          <TextArea rows={4} placeholder="What's on your mind?" />
-        </Form.Item>
-        
-        <Form.Item>
-          <Upload
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalContent}>
+        <button className={styles.closeButton} onClick={onClose}>X</button>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+          <textarea
+            placeholder="Content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            required
+          ></textarea>
+          <input
+            type="file"
             accept="image/*"
-            beforeUpload={handleImageUpload}
-            showUploadList={false}
-          >
-            <Button icon={<UploadOutlined />} loading={uploading}>
-              Upload Image
-            </Button>
-          </Upload>
-          {imageUrl && (
-            <div style={{ marginTop: 8 }}>
-              <img src={imageUrl} alt="Preview" style={{ maxHeight: 100 }} />
-            </div>
-          )}
-        </Form.Item>
-        
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            Post
-          </Button>
-        </Form.Item>
-      </Form>
-    </Modal>
+            onChange={(e) => setImage(e.target.files[0])}
+          />
+          <button type="submit">Create Post</button>
+        </form>
+      </div>
+    </div>
   );
-}
+};
+
+export default CreatePostModal;

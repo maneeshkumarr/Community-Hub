@@ -1,92 +1,78 @@
 const express = require('express');
 const router = express.Router();
-const { pool } = require('../config/db');
-const authenticate = require('../middlewares/auth');
+const Post = require('../models/post');
 
-// Get all posts with vote counts and comment counts
-router.get('/', async (req, res) => {
+// Create a new post
+router.post('/', async (req, res) => {
   try {
-    const [posts] = await pool.query(`
-      SELECT p.*, u.username,
-        COALESCE(SUM(v.value = 1), 0) AS upvotes,
-        COALESCE(SUM(v.value = -1), 0) AS downvotes,
-        COUNT(c.id) AS comment_count
-      FROM posts p
-      JOIN users u ON p.user_id = u.id
-      LEFT JOIN votes v ON p.id = v.post_id
-      LEFT JOIN comments c ON p.id = c.post_id
-      GROUP BY p.id
-      ORDER BY p.created_at DESC
-    `);
-    res.json(posts);
+    const post = new Post(req.body);
+    await post.save();
+    res.status(201).json(post);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error fetching posts' });
+    res.status(400).json({ error: error.message });
   }
 });
 
-// Create a new post
-router.post('/', authenticate, async (req, res) => {
-  const { title, content, category, image_url } = req.body;
+// Get all posts
+router.get('/', async (req, res) => {
   try {
-    const [result] = await pool.query(
-      'INSERT INTO posts (user_id, title, content, category, image_url) VALUES (?, ?, ?, ?, ?)',
-      [req.user.id, title, content, category, image_url]
-    );
-    
-    const [newPost] = await pool.query(`
-      SELECT p.*, u.username, 0 AS upvotes, 0 AS downvotes, 0 AS comment_count
-      FROM posts p
-      JOIN users u ON p.user_id = u.id
-      WHERE p.id = ?
-    `, [result.insertId]);
-    
-    res.status(201).json(newPost[0]);
+    const posts = await Post.find();
+    res.status(200).json(posts);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error creating post' });
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get a single post by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+    res.status(200).json(post);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Update a post by ID
+router.put('/:id', async (req, res) => {
+  try {
+    const post = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+    res.status(200).json(post);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Delete a post by ID
+router.delete('/:id', async (req, res) => {
+  try {
+    const post = await Post.findByIdAndDelete(req.params.id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+    res.status(200).json({ message: 'Post deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
 // Vote on a post
-router.patch('/:id/vote', authenticate, async (req, res) => {
-  const { value } = req.body;
-  const postId = req.params.id;
-  
+router.patch('/:id/vote', async (req, res) => {
   try {
-    // Check if user already voted
-    const [existingVote] = await pool.query(
-      'SELECT * FROM votes WHERE post_id = ? AND user_id = ?',
-      [postId, req.user.id]
-    );
-    
-    if (existingVote.length > 0) {
-      await pool.query(
-        'UPDATE votes SET value = ? WHERE post_id = ? AND user_id = ?',
-        [value, postId, req.user.id]
-      );
-    } else {
-      await pool.query(
-        'INSERT INTO votes (post_id, user_id, value) VALUES (?, ?, ?)',
-        [postId, req.user.id, value]
-      );
+    const { voteType } = req.body;
+    if (!['upvote', 'downvote'].includes(voteType)) {
+      return res.status(400).json({ error: 'Invalid vote type' });
     }
-    
-    // Get updated vote counts
-    const [[upvotes]] = await pool.query(
-      'SELECT COUNT(*) AS count FROM votes WHERE post_id = ? AND value = 1',
-      [postId]
-    );
-    
-    const [[downvotes]] = await pool.query(
-      'SELECT COUNT(*) AS count FROM votes WHERE post_id = ? AND value = -1',
-      [postId]
-    );
-    
-    res.json({ upvotes: upvotes.count, downvotes: downvotes.count });
+
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+
+    post.votes += voteType === 'upvote' ? 1 : -1;
+    await post.save();
+
+    res.status(200).json(post);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error processing vote' });
+    res.status(500).json({ error: error.message });
   }
 });
 

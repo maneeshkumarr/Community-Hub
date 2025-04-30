@@ -16,6 +16,11 @@ const PostSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  category: {
+    type: String,
+    required: true,
+    enum: ['Discussion', 'News', 'Posts', 'Query', 'Job'],
+  },
   createdAt: {
     type: Date,
     default: Date.now,

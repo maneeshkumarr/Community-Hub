@@ -9,7 +9,6 @@ const PostCard = ({ post, onVote }) => {
     if (update.type === 'vote') {
       setVotes(update.votes);
     }
-    // Handle other update types (e.g., comments) if needed
   });
 
   const handleVote = async (voteType) => {
@@ -31,15 +30,23 @@ const PostCard = ({ post, onVote }) => {
 
   return (
     <div className={styles.postCard}>
-      <h3>{post.title}</h3>
-      <p>{post.content}</p>
-      {post.image && <img src={post.image} alt={post.title} className={styles.image} />}
-      <div className={styles.actions}>
-        <button onClick={() => handleVote('upvote')}>Upvote</button>
-        <span>{votes}</span>
-        <button onClick={() => handleVote('downvote')}>Downvote</button>
+      <div className={styles.postCardHeader}>
+        <img src={post.user.avatar} alt={post.user.username} className={styles.avatar} />
+        <span className={styles.username}>{post.user.username}</span>
       </div>
-      <div className={styles.share}>Share</div>
+      <div className={styles.postCardBody}>
+        <h3>{post.title}</h3>
+        <p>{post.content}</p>
+        {post.image && <img src={post.image} alt={post.title} className={styles.image} />}
+      </div>
+      <div className={styles.postCardFooter}>
+        <div className={styles.actions}>
+          <button onClick={() => handleVote('upvote')} className={styles.upvoteButton}>Upvote</button>
+          <span className={styles.voteCount}>{votes}</span>
+          <button onClick={() => handleVote('downvote')} className={styles.downvoteButton}>Downvote</button>
+        </div>
+        <div className={styles.shareButton}>Share</div>
+      </div>
     </div>
   );
 };

@@ -13,10 +13,24 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Get all posts
+// Get all posts with optional filters
 router.get('/', async (req, res) => {
   try {
-    const posts = await Post.find();
+    const { category, search } = req.query;
+    const query = {};
+
+    if (category) {
+      query.category = category;
+    }
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { content: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    const posts = await Post.find(query);
     res.status(200).json(posts);
   } catch (error) {
     res.status(500).json({ error: error.message });

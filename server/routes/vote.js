@@ -29,6 +29,31 @@ router.get('/post/:post_id', async (req, res) => {
   }
 });
 
+// Get a specific vote by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const vote = await Vote.findById(req.params.id);
+    if (!vote) {
+      return res.status(404).json({ error: 'Vote not found' });
+    }
+    res.status(200).json(vote);
+  } catch (error) {
+    console.error('Error Fetching Vote:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all votes
+router.get('/', async (req, res) => {
+  try {
+    const votes = await Vote.findAll();
+    res.status(200).json(votes);
+  } catch (error) {
+    console.error('Error Fetching Votes:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Update a vote by ID
 router.put('/:id', async (req, res) => {
   try {

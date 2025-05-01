@@ -13,6 +13,12 @@ const Vote = {
     return rows;
   },
 
+  findById: async (id) => {
+    const query = `SELECT * FROM votes WHERE id = ?`;
+    const [rows] = await pool.execute(query, [id]);
+    return rows[0];
+  },
+
   update: async (id, { value }) => {
     const query = `UPDATE votes SET value = ? WHERE id = ?`;
     const [result] = await pool.execute(query, [value, id]);

@@ -43,17 +43,17 @@ export default function RootLayout({
         </main>
         <footer className="footer" aria-label="Footer Navigation">
           <nav className="footer-nav" aria-label="Footer Links">
-            <Link legacyBehavior href="/home">
-              <a className="nav-icon" aria-label="Home">🏠</a>
+            <Link href="/home">
+              <span className="nav-icon" aria-label="Home">🏠</span>
             </Link>
-            <Link legacyBehavior href="/events">
-              <a className="nav-icon" aria-label="Events">📅</a>
+            <Link href="/events">
+              <span className="nav-icon" aria-label="Events">📅</span>
             </Link>
-            <Link legacyBehavior href="/forums">
-              <a className="nav-icon" aria-label="Forums">💬</a>
+            <Link href="/forums">
+              <span className="nav-icon" aria-label="Forums">💬</span>
             </Link>
-            <Link legacyBehavior href="/settings">
-              <a className="nav-icon" aria-label="Settings">⚙️</a>
+            <Link href="/settings">
+              <span className="nav-icon" aria-label="Settings">⚙️</span>
             </Link>
           </nav>
           <p>&copy; {new Date().getFullYear()} Samriddhi Setu. All rights reserved.</p>

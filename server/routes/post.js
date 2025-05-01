@@ -3,6 +3,7 @@ const router = express.Router();
 const Post = require('../models/post');
 const multer = require('multer');
 const path = require('path');
+const pool = require('../config/db');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -141,4 +142,36 @@ router.patch('/:id/vote', async (req, res) => {
   }
 });
 
+
+
+
+// Add this route to your post routes (likely in routes/post.js)
+router.get('/community-hub', async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        posts.id,
+        posts.title,
+        posts.content,
+        posts.image_url,
+        posts.category,
+        users.username,
+        users.email,
+        COUNT(DISTINCT votes.id) AS upvotes,
+        COUNT(DISTINCT comments.id) AS comments_count
+      FROM posts
+      JOIN users ON posts.user_id = users.id
+      LEFT JOIN votes ON votes.post_id = posts.id AND votes.value = 1
+      LEFT JOIN comments ON comments.post_id = posts.id
+      GROUP BY posts.id
+      ORDER BY posts.created_at DESC
+    `;
+    
+    const [rows] = await pool.execute(query);
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    res.status(500).json({ error: 'Failed to fetch posts' });
+  }
+});
 module.exports = router;

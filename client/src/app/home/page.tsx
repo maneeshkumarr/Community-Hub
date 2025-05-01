@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import styles from './Home/CommunityHub.module.css';
+import styles from './CommunityHub.module.css';
 
 interface Post {
   id: number;
@@ -84,9 +84,16 @@ export default function CommunityHub() {
           filteredPosts.map((post) => (
             <div key={post.id} className={styles.postCard}>
               <div className={styles.userInfo}>
-                <img src="/profile-avatar.png" alt="User Avatar" className={styles.avatar} />
+                <img 
+                  src="/profile-avatar.jpg" 
+                  alt="User Avatar" 
+                  className={styles.avatar}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/default-avatar.webp';
+                  }}
+                />
                 <div>
-                  <p className={styles.username}>{post.username}</p>
+                  <p className={styles.username}>@{post.username}</p>
                   <p className={styles.email}>{post.email}</p>
                 </div>
               </div>
@@ -103,9 +110,15 @@ export default function CommunityHub() {
               )}
               <p className={styles.postContent}>{post.content}</p>
               <div className={styles.actionBar}>
-                <button className={styles.actionButton}>👍 {post.upvotes || 0}</button>
-                <button className={styles.actionButton}>💬 {post.comments_count || 0} Comments</button>
-                <button className={styles.actionButton}>🔗 Share</button>
+                <button className={styles.actionButton}>
+                  👍 {post.upvotes || 0}
+                </button>
+                <button className={styles.actionButton}>
+                  💬 {post.comments_count || 0} Comments
+                </button>
+                <button className={styles.actionButton}>
+                  🔗 Share
+                </button>
               </div>
             </div>
           ))

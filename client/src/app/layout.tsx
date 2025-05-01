@@ -29,34 +29,34 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <header className="header">
-          <button className="menu-icon">☰</button>
+        <header className="header" aria-label="Main Navigation">
+          <button className="menu-icon" aria-label="Open Menu">☰</button>
           <h1 className="app-title">Samriddhi Setu</h1>
-          <div className="profile-icon">
-            <Image src="/profile-avatar.png" alt="Profile" width={40} height={40} />
+          <div className="profile-icon" aria-label="User Profile">
+            <Image src="/profile-avatar.png" alt="User Profile" width={40} height={40} />
           </div>
         </header>
-        <main className="main-content">
+        <main className="main-content" role="main">
           <AntdClientComponents>
             {children}
           </AntdClientComponents>
         </main>
-        <footer className="footer">
-          <nav className="footer-nav">
+        <footer className="footer" aria-label="Footer Navigation">
+          <nav className="footer-nav" aria-label="Footer Links">
             <Link legacyBehavior href="/home">
-              <a className="nav-icon">🏠</a>
+              <a className="nav-icon" aria-label="Home">🏠</a>
             </Link>
             <Link legacyBehavior href="/events">
-              <a className="nav-icon">📅</a>
+              <a className="nav-icon" aria-label="Events">📅</a>
             </Link>
             <Link legacyBehavior href="/forums">
-              <a className="nav-icon">💬</a>
+              <a className="nav-icon" aria-label="Forums">💬</a>
             </Link>
             <Link legacyBehavior href="/settings">
-              <a className="nav-icon">⚙️</a>
+              <a className="nav-icon" aria-label="Settings">⚙️</a>
             </Link>
           </nav>
-          <p>&copy; 2025 Community Hub. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Samriddhi Setu. All rights reserved.</p>
         </footer>
       </body>
     </html>

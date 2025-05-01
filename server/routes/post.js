@@ -22,12 +22,12 @@ router.post('/', upload.single('image'), async (req, res) => {
     console.log('Uploaded File:', req.file);
 
     const { title, content, category } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : null;
+    const image_url = req.file ? `/uploads/${req.file.filename}` : null;
 
-    const result = await Post.create({ title, content, category, image });
+    const result = await Post.create({ title, content, category, image_url });
     console.log('Database Insert Result:', result);
 
-    res.status(201).json({ id: result.insertId, title, content, category, image });
+    res.status(201).json({ id: result.insertId, title, content, category, image_url });
   } catch (error) {
     console.error('Error Creating Post:', error);
     res.status(400).json({ error: error.message });

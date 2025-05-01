@@ -1,11 +1,11 @@
 const pool = require('../config/db');
 
 const Post = {
-  create: async ({ title, content, category, image }) => {
-    const query = `INSERT INTO posts (title, content, category, image, createdAt) VALUES (?, ?, ?, ?, NOW())`;
+  create: async ({ title, content, category, image_url }) => {
+    const query = `INSERT INTO posts (title, content, category, image_url, created_at) VALUES (?, ?, ?, ?, NOW())`;
     console.log('Executing Query:', query);
-    console.log('With Parameters:', [title, content, category, image]);
-    const [result] = await pool.execute(query, [title, content, category, image]);
+    console.log('With Parameters:', [title, content, category, image_url]);
+    const [result] = await pool.execute(query, [title, content, category, image_url]);
     console.log('Insert Result:', result);
     return result;
   },

@@ -29,7 +29,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get a user by ID
+// Ensure all user operations are correct
 router.get('/:id', async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -41,7 +41,6 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Update a user by ID
 router.put('/:id', async (req, res) => {
   try {
     const { username, email, password_hash } = req.body;
@@ -50,18 +49,23 @@ router.put('/:id', async (req, res) => {
     }
 
     const result = await User.update(req.params.id, { username, email, password_hash });
-    res.status(200).json({ message: 'User updated successfully', result });
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.status(200).json({ message: 'User updated successfully' });
   } catch (error) {
     console.error('Error Updating User:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Delete a user by ID
 router.delete('/:id', async (req, res) => {
   try {
     const result = await User.delete(req.params.id);
-    res.status(200).json({ message: 'User deleted successfully', result });
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
     console.error('Error Deleting User:', error);
     res.status(500).json({ error: error.message });

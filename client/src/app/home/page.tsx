@@ -1,7 +1,8 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import styles from './CommunityHub.module.css';
+import PostCard from '../components/PostCard';
+import CategoryFilter from '../components/CategoryFilter';
 
 interface Post {
   id: number;
@@ -17,110 +18,93 @@ interface Post {
 
 export default function CommunityHub() {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [votes, setVotes] = useState<{ [key: number]: number }>({});
+  const [commentVisible, setCommentVisible] = useState<{ [key: number]: boolean }>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        setError(null);
-        const response = await axios.get('http://localhost:5000/api/posts/community-hub');
-        setPosts(response.data);
-      } catch (error) {
-        console.error('Error fetching posts:', error);
-        setError('Failed to load posts. Please try again later.');
+        const res = await axios.get('http://localhost:5000/api/posts/community-hub');
+        setPosts(res.data);
+        const voteMap: { [key: number]: number } = {};
+        res.data.forEach((post: Post) => {
+          voteMap[post.id] = post.upvotes || 0;
+        });
+        setVotes(voteMap);
+      } catch (err) {
+        console.error(err);
+        setError('Failed to load posts.');
       } finally {
         setLoading(false);
       }
     };
-
     fetchPosts();
   }, []);
 
-  const filteredPosts = posts.filter(post => {
-    const matchesCategory = activeCategory === 'All' || post.category === activeCategory.toLowerCase();
-    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         post.content.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const handleVote = (id: number, change: number) => {
+    setVotes((prev) => ({ ...prev, [id]: (prev[id] || 0) + change }));
+  };
+
+  const toggleComments = (id: number) => {
+    setCommentVisible((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const handleShare = (post: Post) => {
+    const url = window.location.href;
+    const text = `${post.title} - ${post.content}`;
+    if (navigator.share) {
+      navigator.share({ title: post.title, text, url }).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(url);
+      alert('Link copied to clipboard!');
+    }
+  };
 
   const categories = ['All', 'Discussion', 'News', 'Posts', 'Query', 'Job'];
 
+  const filteredPosts = posts.filter((post) => {
+    const matchCat = activeCategory === 'All' || post.category?.toLowerCase() === activeCategory.toLowerCase();
+    const matchSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || post.content.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchCat && matchSearch;
+  });
+
   return (
-    <div className={styles.communityHub}>
-      <header className={styles.header}>
-        <h1>Community Hub</h1>
-        <input 
-          type="text" 
-          placeholder="Search posts here..." 
-          className={styles.searchBar}
+    <div className="p-4">
+      <header className="mb-4">
+        <h1 className="text-xl font-bold mb-2">Community Hub</h1>
+        <input
+          type="text"
+          placeholder="Search posts here..."
+          className="w-full border border-gray-300 rounded px-3 py-2 mb-3"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <div className={styles.categories}>
-          {categories.map(category => (
-            <button 
-              key={category}
-              className={`${styles.categoryButton} ${activeCategory === category ? styles.active : ''}`}
-              onClick={() => setActiveCategory(category)}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
+        <CategoryFilter categories={categories} activeCategory={activeCategory} onSelect={setActiveCategory} />
       </header>
 
-      <main className={styles.postsContainer}>
+      <main>
         {loading ? (
-          <div className={styles.loading}>Loading posts...</div>
+          <p>Loading posts...</p>
         ) : error ? (
-          <div className={styles.error}>{error}</div>
+          <p className="text-red-500">{error}</p>
         ) : filteredPosts.length === 0 ? (
-          <div className={styles.noPosts}>No posts found</div>
+          <p>No posts found.</p>
         ) : (
           filteredPosts.map((post) => (
-            <div key={post.id} className={styles.postCard}>
-              <div className={styles.userInfo}>
-                <img 
-                  src="/profile-avatar.jpg" 
-                  alt="User Avatar" 
-                  className={styles.avatar}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/default-avatar.webp';
-                  }}
-                />
-                <div>
-                  <p className={styles.username}>@{post.username}</p>
-                  <p className={styles.email}>{post.email}</p>
-                </div>
-              </div>
-              <h2 className={styles.postTitle}>{post.title}</h2>
-              {post.image_url && (
-                <img 
-                  src={post.image_url} 
-                  alt="Post" 
-                  className={styles.postImage}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                />
-              )}
-              <p className={styles.postContent}>{post.content}</p>
-              <div className={styles.actionBar}>
-                <button className={styles.actionButton}>
-                  👍 {post.upvotes || 0}
-                </button>
-                <button className={styles.actionButton}>
-                  💬 {post.comments_count || 0} Comments
-                </button>
-                <button className={styles.actionButton}>
-                  🔗 Share
-                </button>
-              </div>
-            </div>
+            <PostCard
+              key={post.id}
+              post={post}
+              votes={votes[post.id] || 0}
+              onVote={handleVote}
+              onToggleComments={toggleComments}
+              onShare={handleShare}
+              commentsVisible={commentVisible[post.id]}
+            />
           ))
         )}
       </main>

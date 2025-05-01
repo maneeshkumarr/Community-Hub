@@ -40,6 +40,12 @@ const commentRoutes = require('./routes/comment');
 // Mount the comment route
 app.use('/api/comments', commentRoutes);
 
+// Import the vote route
+const voteRoutes = require('./routes/vote');
+
+// Mount the vote route
+app.use('/api/votes', voteRoutes);
+
 // Socket.io connection
 io.on('connection', (socket) => {
   console.log('New client connected');

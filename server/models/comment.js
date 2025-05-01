@@ -13,6 +13,12 @@ const Comment = {
     return rows;
   },
 
+  findAll: async () => {
+    const query = `SELECT * FROM comments`;
+    const [rows] = await pool.execute(query);
+    return rows;
+  },
+
   update: async (id, { content }) => {
     const query = `UPDATE comments SET content = ? WHERE id = ?`;
     const [result] = await pool.execute(query, [content, id]);

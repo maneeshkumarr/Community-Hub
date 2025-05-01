@@ -5,13 +5,13 @@ const Vote = require('../models/vote');
 // Create a new vote
 router.post('/', async (req, res) => {
   try {
-    const { post_id, user_id, vote_type } = req.body;
-    if (!post_id || !user_id || !vote_type) {
-      return res.status(400).json({ error: 'All fields are required: post_id, user_id, vote_type' });
+    const { post_id, user_id, value } = req.body;
+    if (!post_id || !user_id || (value !== 1 && value !== -1)) {
+      return res.status(400).json({ error: 'All fields are required: post_id, user_id, value (1 for upvote, -1 for downvote)' });
     }
 
-    const result = await Vote.create({ post_id, user_id, vote_type });
-    res.status(201).json({ id: result.insertId, post_id, user_id, vote_type });
+    const result = await Vote.create({ post_id, user_id, value });
+    res.status(201).json({ id: result.insertId, post_id, user_id, value });
   } catch (error) {
     console.error('Error Creating Vote:', error);
     res.status(500).json({ error: error.message });
@@ -32,12 +32,12 @@ router.get('/post/:post_id', async (req, res) => {
 // Update a vote by ID
 router.put('/:id', async (req, res) => {
   try {
-    const { vote_type } = req.body;
-    if (!vote_type) {
-      return res.status(400).json({ error: 'Vote type is required' });
+    const { value } = req.body;
+    if (value !== 1 && value !== -1) {
+      return res.status(400).json({ error: 'Value must be 1 (upvote) or -1 (downvote)' });
     }
 
-    const result = await Vote.update(req.params.id, { vote_type });
+    const result = await Vote.update(req.params.id, { value });
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Vote not found' });
     }

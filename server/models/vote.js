@@ -1,9 +1,9 @@
 const pool = require('../config/db');
 
 const Vote = {
-  create: async ({ post_id, user_id, vote_type }) => {
-    const query = `INSERT INTO votes (post_id, user_id, vote_type, created_at) VALUES (?, ?, ?, NOW())`;
-    const [result] = await pool.execute(query, [post_id, user_id, vote_type]);
+  create: async ({ post_id, user_id, value }) => {
+    const query = `INSERT INTO votes (post_id, user_id, value, created_at) VALUES (?, ?, ?, NOW())`;
+    const [result] = await pool.execute(query, [post_id, user_id, value]);
     return result;
   },
 
@@ -13,9 +13,9 @@ const Vote = {
     return rows;
   },
 
-  update: async (id, { vote_type }) => {
-    const query = `UPDATE votes SET vote_type = ? WHERE id = ?`;
-    const [result] = await pool.execute(query, [vote_type, id]);
+  update: async (id, { value }) => {
+    const query = `UPDATE votes SET value = ? WHERE id = ?`;
+    const [result] = await pool.execute(query, [value, id]);
     return result;
   },
 

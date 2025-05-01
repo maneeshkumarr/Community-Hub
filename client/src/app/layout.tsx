@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SearchOutlined } from '@ant-design/icons';
 import "./globals.css";
+import AntdClientComponents from './components/AntdClientComponents';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,32 +26,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <header style={{ backgroundColor: '#0070f3', color: '#fff', padding: '10px 20px' }}>
-          <h1>Samriddhi Setu</h1>
-          <div style={{ marginTop: '10px' }}>
-            <input
-              type="text"
-              placeholder="Search posts here..."
-              style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
-            />
-          </div>
-          <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'space-around' }}>
-            <button style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>All</button>
-            <button style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>Discussion</button>
-            <button style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>News</button>
-            <button style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>Posts</button>
-            <button style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>Query</button>
-            <button style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>Job</button>
-          </div>
-        </header>
-        <main>{children}</main>
-        <footer style={{ position: 'fixed', bottom: 0, width: '100%', backgroundColor: '#0070f3', color: '#fff', display: 'flex', justifyContent: 'space-around', padding: '10px 0' }}>
-          <button style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>Home</button>
-          <button style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>Explore</button>
-          <button style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>Notifications</button>
-          <button style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>Profile</button>
-        </footer>
+      <body>
+        <AntdClientComponents>
+          {children}
+        </AntdClientComponents>
       </body>
     </html>
   );

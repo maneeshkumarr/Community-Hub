@@ -3,6 +3,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -17,6 +18,15 @@ const io = new Server(server, {
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+
+// Serve static files from the uploads directory
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Import the post route
+const postRoutes = require('./routes/post');
+
+// Mount the post route
+app.use('/api/posts', postRoutes);
 
 // Socket.io connection
 io.on('connection', (socket) => {

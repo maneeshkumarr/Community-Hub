@@ -1,38 +1,46 @@
 const express = require('express');
 const router = express.Router();
 const Post = require('../models/post');
+const multer = require('multer');
+const path = require('path');
 
-// Create a new post
-router.post('/', async (req, res) => {
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '../../uploads'));
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+const upload = multer({ storage });
+
+// Add logging to debug the `POST /api/posts` endpoint
+router.post('/', upload.single('image'), async (req, res) => {
   try {
-    const post = new Post(req.body);
-    await post.save();
-    res.status(201).json(post);
+    console.log('Request Body:', req.body);
+    console.log('Uploaded File:', req.file);
+
+    const { title, content, category } = req.body;
+    const image = req.file ? `/uploads/${req.file.filename}` : null;
+
+    const result = await Post.create({ title, content, category, image });
+    console.log('Database Insert Result:', result);
+
+    res.status(201).json({ id: result.insertId, title, content, category, image });
   } catch (error) {
+    console.error('Error Creating Post:', error);
     res.status(400).json({ error: error.message });
   }
 });
 
-// Get all posts with optional filters
+// Updated the `GET /api/posts` endpoint to use MySQL-based `Post.findAll`
 router.get('/', async (req, res) => {
   try {
-    const { category, search } = req.query;
-    const query = {};
-
-    if (category) {
-      query.category = category;
-    }
-
-    if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { content: { $regex: search, $options: 'i' } },
-      ];
-    }
-
-    const posts = await Post.find(query);
+    const posts = await Post.findAll();
     res.status(200).json(posts);
   } catch (error) {
+    console.error('Error Fetching Posts:', error);
     res.status(500).json({ error: error.message });
   }
 });

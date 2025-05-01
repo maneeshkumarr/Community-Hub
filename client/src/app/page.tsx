@@ -112,7 +112,7 @@ export default function CommunityHub() {
   });
 
   return (
-    <div className="p-4">
+    <div className="p-4 pt-16">
       <header className="mb-4 bg-green-100 p-4 rounded">
         <h1 className="text-xl font-bold mb-3">Community Hub</h1>
         <div className="relative mb-4">

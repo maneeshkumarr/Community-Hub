@@ -9,7 +9,6 @@ const Post = {
     console.log('Insert Result:', result);
     return result;
   },
-
   findAll: async () => {
     const query = `SELECT * FROM posts`;
     const [rows] = await pool.execute(query);

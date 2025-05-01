@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SearchOutlined } from '@ant-design/icons';
+import Link from 'next/link';
 import "./globals.css";
 import AntdClientComponents from './components/AntdClientComponents';
 
@@ -27,9 +28,30 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AntdClientComponents>
-          {children}
-        </AntdClientComponents>
+        <header className="navbar">
+          <div className="logo">Community Hub</div>
+          <nav>
+            <ul className="nav-links">
+              <li><Link href="/">Home</Link></li>
+              <li><Link href="/events">Events</Link></li>
+              <li><Link href="/forums">Forums</Link></li>
+              <li><Link href="/resources">Resources</Link></li>
+            </ul>
+          </nav>
+        </header>
+        <main>
+          <section className="hero">
+            <h1>Welcome to the Community Hub</h1>
+            <p>Connect, share, and grow with your community.</p>
+            <button className="cta-button">Join the Community</button>
+          </section>
+          <AntdClientComponents>
+            {children}
+          </AntdClientComponents>
+        </main>
+        <footer className="footer">
+          <p>&copy; 2025 Community Hub. All rights reserved.</p>
+        </footer>
       </body>
     </html>
   );

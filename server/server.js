@@ -34,6 +34,12 @@ const userRoutes = require('./routes/user');
 // Mount the user route
 app.use('/api/users', userRoutes);
 
+// Import the comment route
+const commentRoutes = require('./routes/comment');
+
+// Mount the comment route
+app.use('/api/comments', commentRoutes);
+
 // Socket.io connection
 io.on('connection', (socket) => {
   console.log('New client connected');

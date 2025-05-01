@@ -1,0 +1,87 @@
+/* PostSection styles */
+.postSection {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin: 1rem 0;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 1rem;
+}
+
+.username {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.handle {
+  font-size: 0.875rem;
+  color: #777;
+}
+
+.optionsButton {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.postTitle {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.imageGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.postImage {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.postDescription {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.actionBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #d4eac7;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.actionButton {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.actionButton:hover {
+  color: #0070f3;
+}

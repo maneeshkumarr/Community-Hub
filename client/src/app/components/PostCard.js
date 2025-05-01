@@ -61,3 +61,21 @@ const PostCard = ({ post, onVote }) => {
 };
 
 export default PostCard;
+
+import React from 'react';
+import styles from './PostCard.module.css';
+
+const PostCard = ({ title, description, date, author }) => {
+  return (
+    <div className={styles.card}>
+      <h3 className={styles.title}>{title}</h3>
+      <p className={styles.description}>{description}</p>
+      <div className={styles.footer}>
+        <span className={styles.date}>{date}</span>
+        <span className={styles.author}>by {author}</span>
+      </div>
+    </div>
+  );
+};
+
+export default PostCard;

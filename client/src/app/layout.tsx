@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SearchOutlined } from '@ant-design/icons';
 import Link from 'next/link';
+import Image from 'next/image';
 import "./globals.css";
 import AntdClientComponents from './components/AntdClientComponents';
 
@@ -28,28 +29,33 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <header className="navbar">
-          <div className="logo">Community Hub</div>
-          <nav>
-            <ul className="nav-links">
-              <li><Link href="/">Home</Link></li>
-              <li><Link href="/events">Events</Link></li>
-              <li><Link href="/forums">Forums</Link></li>
-              <li><Link href="/resources">Resources</Link></li>
-            </ul>
-          </nav>
+        <header className="header">
+          <button className="menu-icon">☰</button>
+          <h1 className="app-title">Samriddhi Setu</h1>
+          <div className="profile-icon">
+            <Image src="/profile-avatar.png" alt="Profile" width={40} height={40} />
+          </div>
         </header>
-        <main>
-          <section className="hero">
-            <h1>Welcome to the Community Hub</h1>
-            <p>Connect, share, and grow with your community.</p>
-            <button className="cta-button">Join the Community</button>
-          </section>
+        <main className="main-content">
           <AntdClientComponents>
             {children}
           </AntdClientComponents>
         </main>
         <footer className="footer">
+          <nav className="footer-nav">
+            <Link legacyBehavior href="/home">
+              <a className="nav-icon">🏠</a>
+            </Link>
+            <Link legacyBehavior href="/events">
+              <a className="nav-icon">📅</a>
+            </Link>
+            <Link legacyBehavior href="/forums">
+              <a className="nav-icon">💬</a>
+            </Link>
+            <Link legacyBehavior href="/settings">
+              <a className="nav-icon">⚙️</a>
+            </Link>
+          </nav>
           <p>&copy; 2025 Community Hub. All rights reserved.</p>
         </footer>
       </body>

@@ -1,0 +1,77 @@
+/* DiscussionFeed styles */
+.discussionFeed {
+  padding: 2rem;
+  background-color: #ffffff;
+}
+
+.heading {
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.postList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.postItem {
+  background: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.postHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 1rem;
+}
+
+.username {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.timestamp {
+  font-size: 0.875rem;
+  color: #777;
+}
+
+.content {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.replyButton,
+.likeButton {
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.replyButton:hover,
+.likeButton:hover {
+  background-color: #005bb5;
+}

@@ -3,8 +3,9 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import PostCard from './components/PostCard';
 import CategoryFilter from './components/CategoryFilter';
+import { FiSearch } from 'react-icons/fi';
 
-interface Post {
+type Post = {
   id: number;
   title: string;
   content: string;
@@ -14,7 +15,7 @@ interface Post {
   upvotes?: number;
   comments_count?: number;
   category?: string;
-}
+};
 
 export default function CommunityHub() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -33,6 +34,8 @@ export default function CommunityHub() {
     category: '',
     image: null as File | null,
   });
+
+  const categories = ['All', 'Discussion', 'News', 'Posts', 'Query', 'Job'];
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -76,7 +79,6 @@ export default function CommunityHub() {
 
   const handlePostSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     const formData = new FormData();
     formData.append('title', newPost.title);
     formData.append('content', newPost.content);
@@ -101,26 +103,33 @@ export default function CommunityHub() {
     }
   };
 
-  const categories = ['All', 'Discussion', 'News', 'Posts', 'Query', 'Job'];
-
   const filteredPosts = posts.filter((post) => {
     const matchCat = activeCategory === 'All' || post.category?.toLowerCase() === activeCategory.toLowerCase();
-    const matchSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || post.content.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchSearch =
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.content.toLowerCase().includes(searchQuery.toLowerCase());
     return matchCat && matchSearch;
   });
 
   return (
     <div className="p-4">
-      <header className="mb-4">
-        <h1 className="text-xl font-bold mb-2">Community Hub</h1>
-        <input
-          type="text"
-          placeholder="Search posts here..."
-          className="w-full border border-gray-300 rounded px-3 py-2 mb-3"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+      <header className="mb-4 bg-green-100 p-4 rounded">
+        <h1 className="text-xl font-bold mb-3">Community Hub</h1>
+        <div className="relative mb-4">
+          <FiSearch className="absolute left-3 top-2.5 text-green-800" />
+          <input
+            type="text"
+            placeholder="Search posts here..."
+            className="w-full pl-10 pr-3 py-2 rounded border border-black"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <CategoryFilter
+          categories={categories}
+          activeCategory={activeCategory}
+          onSelect={setActiveCategory}
         />
-        <CategoryFilter categories={categories} activeCategory={activeCategory} onSelect={setActiveCategory} />
       </header>
 
       <button

@@ -1,24 +1,25 @@
+import React from 'react';
 
-interface Props {
+type Props = {
   categories: string[];
   activeCategory: string;
   onSelect: (category: string) => void;
+};
+
+export default function CategoryFilter({ categories, activeCategory, onSelect }: Props) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {categories.map((cat) => (
+        <button
+          key={cat}
+          onClick={() => onSelect(cat)}
+          className={`px-3 py-1 rounded-full border border-black text-sm font-medium
+            ${activeCategory === cat ? 'bg-green-600 text-white' : 'bg-white text-gray-800'}
+          `}
+        >
+          {cat}
+        </button>
+      ))}
+    </div>
+  );
 }
-
-const CategoryFilter: React.FC<Props> = ({ categories, activeCategory, onSelect }) => (
-  <div className="flex flex-wrap gap-2 mb-3">
-    {categories.map((category) => (
-      <button
-        key={category}
-        onClick={() => onSelect(category)}
-        className={`px-3 py-1 rounded-full text-sm ${
-          activeCategory === category ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'
-        }`}
-      >
-        {category}
-      </button>
-    ))}
-  </div>
-);
-
-export default CategoryFilter;

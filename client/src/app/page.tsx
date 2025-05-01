@@ -1,8 +1,8 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import PostCard from '../components/PostCard';
-import CategoryFilter from '../components/CategoryFilter';
+import PostCard from './components/PostCard';
+import CategoryFilter from './components/CategoryFilter';
 
 interface Post {
   id: number;

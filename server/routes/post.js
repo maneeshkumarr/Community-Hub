@@ -21,13 +21,38 @@ router.post('/', upload.single('image'), async (req, res) => {
     console.log('Request Body:', req.body);
     console.log('Uploaded File:', req.file);
 
-    const { title, content, category } = req.body;
+    // Include `user_id` in the request body
+    const { user_id, title, content, category } = req.body;
+    if (!user_id || isNaN(user_id)) {
+      return res.status(400).json({ error: 'Invalid user_id. A valid user_id is required.' });
+    }
+
     const image_url = req.file ? `/uploads/${req.file.filename}` : null;
 
-    const result = await Post.create({ title, content, category, image_url });
+    console.log('Processed Data:', { user_id, title, content, category, image_url });
+
+    // Validate all fields in the request body
+    if (!title || typeof title !== 'string' || title.trim() === '') {
+      return res.status(400).json({ error: 'Invalid title. Title must be a non-empty string.' });
+    }
+
+    if (!content || typeof content !== 'string' || content.trim() === '') {
+      return res.status(400).json({ error: 'Invalid content. Content must be a non-empty string.' });
+    }
+
+    const validCategories = ['discussion', 'news', 'post', 'query', 'job'];
+    if (!validCategories.includes(category)) {
+      return res.status(400).json({ error: `Invalid category. Allowed values are: ${validCategories.join(', ')}` });
+    }
+
+    if (image_url && typeof image_url !== 'string') {
+      return res.status(400).json({ error: 'Invalid image URL. It must be a string.' });
+    }
+
+    const result = await Post.create({ user_id, title, content, category, image_url });
     console.log('Database Insert Result:', result);
 
-    res.status(201).json({ id: result.insertId, title, content, category, image_url });
+    res.status(201).json({ id: result.insertId, user_id, title, content, category, image_url });
   } catch (error) {
     console.error('Error Creating Post:', error);
     res.status(400).json({ error: error.message });

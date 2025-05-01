@@ -19,6 +19,12 @@ const Vote = {
     return rows[0];
   },
 
+  findAll: async () => {
+    const query = `SELECT * FROM votes`;
+    const [rows] = await pool.execute(query);
+    return rows;
+  },
+
   update: async (id, { value }) => {
     const query = `UPDATE votes SET value = ? WHERE id = ?`;
     const [result] = await pool.execute(query, [value, id]);

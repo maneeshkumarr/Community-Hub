@@ -28,6 +28,12 @@ const postRoutes = require('./routes/post');
 // Mount the post route
 app.use('/api/posts', postRoutes);
 
+// Import the user route
+const userRoutes = require('./routes/user');
+
+// Mount the user route
+app.use('/api/users', userRoutes);
+
 // Socket.io connection
 io.on('connection', (socket) => {
   console.log('New client connected');

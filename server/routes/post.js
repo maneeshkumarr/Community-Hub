@@ -15,19 +15,23 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Add logging to debug the `POST /api/posts` endpoint
+// Ensure the field name in multer matches the request
 router.post('/', upload.single('image'), async (req, res) => {
   try {
     console.log('Request Body:', req.body);
     console.log('Uploaded File:', req.file);
 
-    // Include `user_id` in the request body
     const { user_id, title, content, category } = req.body;
     if (!user_id || isNaN(user_id)) {
       return res.status(400).json({ error: 'Invalid user_id. A valid user_id is required.' });
     }
 
-    const image_url = req.file ? `/uploads/${req.file.filename}` : null;
+    // Add logging to debug why `image_url` is null
+    console.log('Request Body image_url:', req.body.image_url);
+    console.log('Uploaded File:', req.file);
+
+    const image_url = req.body.image_url || (req.file ? `/uploads/${req.file.filename}` : null);
+    console.log('Final image_url:', image_url);
 
     console.log('Processed Data:', { user_id, title, content, category, image_url });
 
@@ -81,24 +85,38 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Update a post by ID
+// Replace `findByIdAndUpdate` with the new `update` method
 router.put('/:id', async (req, res) => {
   try {
-    const post = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!post) return res.status(404).json({ error: 'Post not found' });
-    res.status(200).json(post);
+    const { title, content, category, image_url } = req.body;
+    console.log('Request to update post with ID:', req.params.id, { title, content, category, image_url });
+
+    const result = await Post.update(req.params.id, { title, content, category, image_url });
+    console.log('Update Query Result:', result);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    res.status(200).json({ message: 'Post updated successfully' });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error('Error Updating Post:', error);
+    res.status(500).json({ error: error.message });
   }
 });
 
-// Delete a post by ID
+// Add logging to debug the `DELETE /api/posts/:id` route
 router.delete('/:id', async (req, res) => {
   try {
-    const post = await Post.findByIdAndDelete(req.params.id);
-    if (!post) return res.status(404).json({ error: 'Post not found' });
+    console.log('Request to delete post with ID:', req.params.id);
+    const result = await Post.delete(req.params.id);
+    console.log('Delete Query Result:', result);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
     res.status(200).json({ message: 'Post deleted successfully' });
   } catch (error) {
+    console.error('Error Deleting Post:', error);
     res.status(500).json({ error: error.message });
   }
 });

@@ -13,6 +13,15 @@ import {
 } from 'react-icons/fi';
 import { MdGavel } from 'react-icons/md';
 
+type Comment = {
+  id: number;
+  user_id: number;
+  post_id: number;
+  content: string;
+  created_at: string;
+  username?: string;
+};
+
 type Post = {
   id: number;
   title: string;
@@ -28,6 +37,7 @@ type Post = {
 interface PostCardProps {
   post: Post;
   votes: number;
+  comments?: Comment[];
   onVote: (id: number, change: number) => void;
   onToggleComments: (id: number) => void;
   onShare: (post: Post) => void;
@@ -38,6 +48,7 @@ interface PostCardProps {
 const PostCard: React.FC<PostCardProps> = ({
   post,
   votes,
+  comments = [],
   onVote,
   onToggleComments,
   onShare,
@@ -53,12 +64,12 @@ const PostCard: React.FC<PostCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden mb-4">
+    <div className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden mb-4 relative">
       {/* Header */}
       <div className="bg-[#033C4A] px-4 py-2 flex justify-between items-center text-white">
         <div className="flex items-center space-x-3">
           <img
-            src="/avatar.png" // Replace with actual avatar URL or a placeholder
+            src="/manish.avif"
             alt="Avatar"
             className="w-8 h-8 rounded-full border border-white"
           />
@@ -151,9 +162,7 @@ const PostCard: React.FC<PostCardProps> = ({
             <span className="text-green-700">{votes}</span>
           </button>
           <div className="flex items-center space-x-1">
-            <span role="img" aria-label="downvote">
-              👎
-            </span>
+            <span role="img" aria-label="downvote">👎</span>
             <span>09</span>
           </div>
           <button
@@ -169,6 +178,25 @@ const PostCard: React.FC<PostCardProps> = ({
           <span>Share</span>
         </button>
       </div>
+
+      {/* Comments Section */}
+      {commentsVisible && (
+        <div className="px-4 py-2 bg-gray-50 border-t text-sm text-gray-700">
+          {comments && comments.length > 0 ? (
+            comments.map((comment) => (
+              <div key={comment.id} className="border-b py-1">
+                <p className="font-semibold">{comment.username || `User #${comment.user_id}`}</p>
+                <p>{comment.content}</p>
+                <p className="text-xs text-gray-500">
+                  {new Date(comment.created_at).toLocaleString()}
+                </p>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500 italic">No comments yet.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 };

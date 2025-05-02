@@ -10,11 +10,25 @@ const Post = {
     return result;
   },
   findAll: async () => {
-    const query = `SELECT * FROM posts`;
+    const query = `
+      SELECT 
+        p.*,
+        u.username,
+        u.email,
+        COUNT(DISTINCT c.id) AS comments_count,
+        COALESCE(SUM(CASE WHEN v.value = 1 THEN 1 ELSE 0 END), 0) AS upvotes,
+        COALESCE(SUM(CASE WHEN v.value = -1 THEN 1 ELSE 0 END), 0) AS downvotes,
+        COALESCE(SUM(v.value), 0) AS net_votes
+      FROM posts p
+      JOIN users u ON p.user_id = u.id
+      LEFT JOIN comments c ON c.post_id = p.id
+      LEFT JOIN votes v ON v.post_id = p.id
+      GROUP BY p.id
+      ORDER BY p.created_at DESC
+    `;
     const [rows] = await pool.execute(query);
     return rows;
   },
-
   findById: async (id) => {
     const query = `SELECT * FROM posts WHERE id = ?`;
     const [rows] = await pool.execute(query, [id]);

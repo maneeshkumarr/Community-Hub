@@ -42,7 +42,7 @@ export default function CommunityHub() {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        const res = await axios.get('http://localhost:5000/api/posts/community-hub');
+        const res = await axios.get('http://localhost:5000/api/posts');
         setPosts(res.data);
         const voteMap: { [key: number]: number } = {};
         res.data.forEach((post: Post) => {

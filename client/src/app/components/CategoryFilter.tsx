@@ -1,25 +1,34 @@
+// src/app/components/CategoryFilter.tsx
 import React from 'react';
 
-type Props = {
+type CategoryFilterProps = {
   categories: string[];
   activeCategory: string;
   onSelect: (category: string) => void;
 };
 
-export default function CategoryFilter({ categories, activeCategory, onSelect }: Props) {
+const CategoryFilter: React.FC<CategoryFilterProps> = ({
+  categories,
+  activeCategory,
+  onSelect,
+}) => {
   return (
     <div className="flex flex-wrap gap-2">
-      {categories.map((cat) => (
+      {categories.map((category) => (
         <button
-          key={cat}
-          onClick={() => onSelect(cat)}
-          className={`px-3 py-1 rounded-full border border-black text-sm font-medium
-            ${activeCategory === cat ? 'bg-green-600 text-white' : 'bg-white text-gray-800'}
-          `}
+          key={category}
+          onClick={() => onSelect(category)}
+          className={`px-3 py-1 rounded border ${
+            activeCategory === category
+              ? 'bg-green-700 text-white'
+              : 'bg-white text-black border-green-700'
+          } hover:bg-green-600 hover:text-white`}
         >
-          {cat}
+          {category}
         </button>
       ))}
     </div>
   );
-}
+};
+
+export default CategoryFilter;

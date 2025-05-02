@@ -17,7 +17,7 @@ export default function HomePage() {
             </p>
           </div>
           <Image
-            src="/community-banner.png"
+            src="/community-banner.avif"
             alt="Community"
             width={300}
             height={200}

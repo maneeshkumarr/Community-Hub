@@ -7,14 +7,14 @@ import { FiSearch } from 'react-icons/fi';
 
 type Post = {
   id: number;
-  title: string;
-  content: string;
+  title?: string | null;
+  content?: string | null;
   username: string;
   email: string;
   image_url?: string;
   upvotes?: number;
   comments_count?: number;
-  category?: string;
+  category?: string | null;
 };
 
 type Comment = {
@@ -94,9 +94,9 @@ export default function CommunityHub() {
 
   const handleShare = (post: Post) => {
     const url = window.location.href;
-    const text = `${post.title} - ${post.content}`;
+    const text = `${post.title || ''} - ${post.content || ''}`;
     if (navigator.share) {
-      navigator.share({ title: post.title, text, url }).catch(console.error);
+      navigator.share({ title: post.title || '', text, url }).catch(console.error);
     } else {
       navigator.clipboard.writeText(url);
       alert('Link copied to clipboard!');
@@ -141,10 +141,14 @@ export default function CommunityHub() {
   };
 
   const filteredPosts = posts.filter((post) => {
-    const matchCat = activeCategory === 'All' || post.category?.toLowerCase() === activeCategory.toLowerCase();
+    const matchCat =
+      activeCategory === 'All' ||
+      (post.category?.toLowerCase() === activeCategory.toLowerCase());
+
     const matchSearch =
-      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.content.toLowerCase().includes(searchQuery.toLowerCase());
+      (post.title?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
+      (post.content?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false);
+
     return matchCat && matchSearch;
   });
 
@@ -256,7 +260,7 @@ export default function CommunityHub() {
               onShare={handleShare}
               onDelete={handleDelete}
               commentsVisible={commentVisible[post.id]}
-              comments={commentsByPostId[post.id] || []} // ✅ Added here
+              comments={commentsByPostId[post.id] || []}
             />
           ))
         )}

@@ -25,7 +25,7 @@ export default function Header() {
       {/* Header */}
       <header className="bg-white shadow-md fixed top-0 left-0 w-full z-50">
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-          {/* Left - Hamburger */}
+          {/* Left - Hamburger (Mobile only) */}
           <button
             className="md:hidden text-black"
             onClick={() => setMenuOpen(true)}
@@ -34,8 +34,21 @@ export default function Header() {
             <Menu size={24} />
           </button>
 
-          {/* Center - Title */}
-          <h1 className="text-black font-bold text-lg">Samriddhi Setu</h1>
+          {/* Center - Title or Nav (Title hidden on desktop if nav is shown) */}
+          <h1 className="text-black font-bold text-lg md:hidden">Samriddhi Setu</h1>
+
+          {/* Center - Nav Links (visible on desktop) */}
+          <nav className="hidden md:flex gap-6">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                className="text-black hover:text-green-700 font-medium transition-colors"
+              >
+                {link.name}
+              </Link>
+            ))}
+          </nav>
 
           {/* Right - Profile */}
           <div className="relative">
@@ -44,7 +57,7 @@ export default function Header() {
               className="rounded-full border-2 border-black"
             >
               <Image
-                src="/profile.jpg" // Update path
+                src="/profile.jpg"
                 alt="Profile"
                 width={32}
                 height={32}

@@ -17,6 +17,7 @@ type Post = {
   category?: string;
 };
 
+
 export default function CommunityHub() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [votes, setVotes] = useState<{ [key: number]: number }>({});
@@ -76,6 +77,18 @@ export default function CommunityHub() {
       alert('Link copied to clipboard!');
     }
   };
+
+  const handleDelete = async (postId: number) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/posts/${postId}`);
+      setPosts((prev) => prev.filter((post) => post.id !== postId));
+      alert('Post deleted.');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to delete post.');
+    }
+  };
+  
 
   const handlePostSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -211,17 +224,21 @@ export default function CommunityHub() {
         ) : (
           filteredPosts.map((post) => (
             <PostCard
-              key={post.id}
-              post={post}
-              votes={votes[post.id] || 0}
-              onVote={handleVote}
-              onToggleComments={toggleComments}
-              onShare={handleShare}
-              commentsVisible={commentVisible[post.id]}
-            />
+            key={post.id}
+            post={post}
+            votes={votes[post.id] || 0}
+            onVote={handleVote}
+            onToggleComments={toggleComments}
+            onShare={handleShare}
+            onDelete={handleDelete}
+            commentsVisible={commentVisible[post.id]}
+          />
+          
+          
           ))
         )}
       </main>
+      
     </div>
   );
 }

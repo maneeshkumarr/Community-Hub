@@ -7,14 +7,27 @@ const Comment = {
     return result;
   },
 
+  // ✅ Updated: Fetch comments for a specific post with the username
   findAllByPostId: async (post_id) => {
-    const query = `SELECT * FROM comments WHERE post_id = ?`;
+    const query = `
+      SELECT c.id, c.post_id, c.user_id, u.username, c.content, c.created_at
+      FROM comments c
+      JOIN users u ON c.user_id = u.id
+      WHERE c.post_id = ?
+      ORDER BY c.created_at ASC
+    `;
     const [rows] = await pool.execute(query, [post_id]);
     return rows;
   },
 
+  // Optional: also update findAll to include usernames (if needed)
   findAll: async () => {
-    const query = `SELECT * FROM comments`;
+    const query = `
+      SELECT c.id, c.post_id, c.user_id, u.username, c.content, c.created_at
+      FROM comments c
+      JOIN users u ON c.user_id = u.id
+      ORDER BY c.created_at ASC
+    `;
     const [rows] = await pool.execute(query);
     return rows;
   },

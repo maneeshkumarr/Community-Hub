@@ -17,11 +17,20 @@ type Post = {
   category?: string;
 };
 
+type Comment = {
+  id: number;
+  post_id: number;
+  user_id: number;
+  username?: string;
+  content: string;
+  created_at: string;
+};
 
 export default function CommunityHub() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [votes, setVotes] = useState<{ [key: number]: number }>({});
   const [commentVisible, setCommentVisible] = useState<{ [key: number]: boolean }>({});
+  const [commentsByPostId, setCommentsByPostId] = useState<{ [key: number]: Comment[] }>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [loading, setLoading] = useState(true);
@@ -56,7 +65,23 @@ export default function CommunityHub() {
         setLoading(false);
       }
     };
+
+    const fetchComments = async () => {
+      try {
+        const res = await axios.get('http://localhost:5000/api/comments');
+        const grouped: { [key: number]: Comment[] } = {};
+        res.data.forEach((comment: Comment) => {
+          if (!grouped[comment.post_id]) grouped[comment.post_id] = [];
+          grouped[comment.post_id].push(comment);
+        });
+        setCommentsByPostId(grouped);
+      } catch (err) {
+        console.error('Failed to fetch comments:', err);
+      }
+    };
+
     fetchPosts();
+    fetchComments();
   }, []);
 
   const handleVote = (id: number, change: number) => {
@@ -88,7 +113,6 @@ export default function CommunityHub() {
       alert('Failed to delete post.');
     }
   };
-  
 
   const handlePostSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -224,21 +248,19 @@ export default function CommunityHub() {
         ) : (
           filteredPosts.map((post) => (
             <PostCard
-            key={post.id}
-            post={post}
-            votes={votes[post.id] || 0}
-            onVote={handleVote}
-            onToggleComments={toggleComments}
-            onShare={handleShare}
-            onDelete={handleDelete}
-            commentsVisible={commentVisible[post.id]}
-          />
-          
-          
+              key={post.id}
+              post={post}
+              votes={votes[post.id] || 0}
+              onVote={handleVote}
+              onToggleComments={toggleComments}
+              onShare={handleShare}
+              onDelete={handleDelete}
+              commentsVisible={commentVisible[post.id]}
+              comments={commentsByPostId[post.id] || []} // ✅ Added here
+            />
           ))
         )}
       </main>
-      
     </div>
   );
 }
